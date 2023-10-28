@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+const bcrypt = require("bcryptjs");
 
 const pool = new Pool({
   user: "postgres",
@@ -8,15 +9,18 @@ const pool = new Pool({
   allowExitOnIdle: true,
 });
 
-const getUsuario = async (email, usuario) => {
+const registroUsuario = async (usuario) => {
   try {
-    const consulta = `SELECT * FROM usuarios WHERE email = $1`;
-    const values = [email];
-    const { rowCount } = pool.query(consulta, values);
-    return rowCount
-  } catch (err) {
-    console.error(err);
+    let { email, password, rol, lenguage } = usuario;
+    const passwordEncriptado = bcrypt.hashSync(password, 10); // Añade el factor de coste (saltRounds) aquí
+    const consulta = "INSERT INTO usuarios (email, password, rol, lenguage) VALUES ($1, $2, $3, $4)";
+    const values = [email, passwordEncriptado, rol, lenguage];
+    const { rowCount } = await pool.query(consulta, values);
+    return rowCount;
+  } catch (error) {
+    console.error(error); // Debes registrar el error en la consola
+    throw error; // Debes lanzar el error para que se maneje adecuadamente en otro lugar
   }
 };
 
-module.exports(getUsuario);
+module.exports = { registroUsuario };
