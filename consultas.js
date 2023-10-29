@@ -45,8 +45,8 @@ const verificarUsuario = async (email, password) => {
 
   if (rowCount === 1) {
     const usuario = rows[0];
-    const passwordEsCorrecta = bcrypt.compareSync(password, usuario.password);
-    if (!passwordEsCorrecta) {
+    const passwordCorrecta = bcrypt.compareSync(password, usuario.password);
+    if (!passwordCorrecta) {
       throw new Error ("Contraseña o Usuario incorrecto");
     }
   }
